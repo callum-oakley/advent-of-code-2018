@@ -4,11 +4,9 @@ extern crate regex;
 
 use std::{env, fmt, process};
 
-mod error;
-
 mod day01;
-
-use error::{read_input, Result};
+mod error;
+use error::Result;
 
 #[derive(Debug, PartialEq)]
 struct Answer {
@@ -26,11 +24,10 @@ impl Answer {
 }
 
 fn run_day(day: u8) -> Result<Answer> {
+    let input01 = include_str!("input/day01");
+
     match day {
-        1 => {
-            let input = read_input("input/day01")?;
-            Ok(Answer::new(day01::part1(&input)?, day01::part2(&input)?))
-        }
+        1 => Ok(Answer::new(day01::part1(input01)?, day01::part2(input01)?)),
         day => bail!("day {} not yet implemented", day),
     }
 }
