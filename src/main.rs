@@ -5,6 +5,7 @@ extern crate regex;
 use std::{env, fmt, process};
 
 mod day01;
+mod day02;
 mod error;
 use error::Result;
 
@@ -25,9 +26,11 @@ impl Answer {
 
 fn run_day(day: u8) -> Result<Answer> {
     let input01 = include_str!("input/day01");
+    let input02 = include_str!("input/day02");
 
     match day {
         1 => Ok(Answer::new(day01::part1(input01)?, day01::part2(input01)?)),
+        2 => Ok(Answer::new(day02::part1(input02)?, day02::part2(input02)?)),
         day => bail!("day {} not yet implemented", day),
     }
 }
@@ -66,5 +69,9 @@ mod tests {
     #[test]
     fn all_days() {
         assert_eq!(run_day(1), Ok(Answer::new(470, 790)));
+        assert_eq!(
+            run_day(2),
+            Ok(Answer::new(6175, "asgwjcmzredihqoutcylvzinx"))
+        );
     }
 }
