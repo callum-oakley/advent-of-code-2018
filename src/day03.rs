@@ -1,8 +1,9 @@
 use error::{parse, re, Error, Result};
 use std::collections::HashMap;
+use std::iter::Iterator;
 use std::str::FromStr;
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 struct Claim {
     id: i32,
     x: usize,
@@ -12,12 +13,9 @@ struct Claim {
 }
 
 impl Claim {
-    fn squares(&self) -> Squares {
-        Squares {
-            claim: self.clone(),
-            x: self.x,
-            y: self.y,
-        }
+    fn squares(&self) -> impl Iterator<Item = (usize, usize)> + '_ {
+        (self.x..self.x + self.width)
+            .flat_map(move |x| (self.y..self.y + self.height).map(move |y| (x, y)))
     }
 }
 
@@ -38,31 +36,6 @@ impl FromStr for Claim {
             width: parse(&caps[4])?,
             height: parse(&caps[5])?,
         })
-    }
-}
-
-struct Squares {
-    claim: Claim,
-    x: usize,
-    y: usize,
-}
-
-impl Iterator for Squares {
-    type Item = (usize, usize);
-
-    fn next(&mut self) -> Option<(usize, usize)> {
-        let (x, y) = (self.x, self.y);
-        if x >= self.claim.x + self.claim.width {
-            return None;
-        }
-
-        self.y += 1;
-        if self.y >= self.claim.y + self.claim.height {
-            self.y = self.claim.y;
-            self.x += 1;
-        }
-
-        Some((x, y))
     }
 }
 
