@@ -1,7 +1,7 @@
-use error::{parse, re, Result};
-
-const FABRIC_W: usize = 1000;
-const FABRIC_H: usize = 1000;
+use error::{parse, re, Error, Result};
+use std::iter::IntoIterator;
+use std::ops::{Index, IndexMut};
+use std::str::FromStr;
 
 #[derive(Debug, Clone)]
 struct Claim {
@@ -13,7 +13,19 @@ struct Claim {
 }
 
 impl Claim {
-    fn new(s: &str) -> Result<Self> {
+    fn squares(&self) -> Squares {
+        Squares {
+            claim: self.clone(),
+            x: self.x,
+            y: self.y,
+        }
+    }
+}
+
+impl FromStr for Claim {
+    type Err = Error;
+
+    fn from_str(s: &str) -> Result<Self> {
         let caps = require_with!(
             re(r"#(\S+)\s@\s(\d+),(\d+):\s(\d+)x(\d+)")?.captures(s),
             "couldn't parse claim {}",
@@ -28,14 +40,6 @@ impl Claim {
             h: parse(&caps[5])?,
         })
     }
-
-    fn squares(&self) -> Squares {
-        Squares {
-            claim: self.clone(),
-            x: self.x,
-            y: self.y,
-        }
-    }
 }
 
 struct Squares {
@@ -43,8 +47,6 @@ struct Squares {
     x: usize,
     y: usize,
 }
-
-// TODO fabric struct to abstract the (x, y) access
 
 impl Iterator for Squares {
     type Item = (usize, usize);
@@ -65,18 +67,59 @@ impl Iterator for Squares {
     }
 }
 
-pub fn part1(input: &str) -> Result<usize> {
-    let claims = input
-        .trim()
-        .lines()
-        .map(|l| Claim::new(l))
-        .collect::<Result<Vec<_>>>()?;
+struct Fabric {
+    width: usize,
+    height: usize,
+    v: Vec<i32>,
+}
 
-    let mut fabric = vec![0; FABRIC_W * FABRIC_H];
+impl Fabric {
+    fn new(width: usize, height: usize) -> Self {
+        Fabric {
+            width,
+            height,
+            v: vec![0; width * height],
+        }
+    }
+}
+
+impl Index<(usize, usize)> for Fabric {
+    type Output = i32;
+
+    fn index(&self, (x, y): (usize, usize)) -> &i32 {
+        if x >= self.width || y >= self.height {
+            panic!("({}, {}) out of bounds", x, y);
+        }
+        &self.v[x + self.width * y]
+    }
+}
+
+impl IndexMut<(usize, usize)> for Fabric {
+    fn index_mut(&mut self, (x, y): (usize, usize)) -> &mut i32 {
+        if x >= self.width || y >= self.height {
+            panic!("({}, {}) out of bounds", x, y);
+        }
+        &mut self.v[x + self.width * y]
+    }
+}
+
+impl IntoIterator for Fabric {
+    type Item = i32;
+    type IntoIter = ::std::vec::IntoIter<i32>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.v.into_iter()
+    }
+}
+
+pub fn part1(input: &str) -> Result<usize> {
+    let claims = parse_input(input)?;
+
+    let mut fabric = Fabric::new(1000, 1000);
 
     for claim in claims.iter() {
-        for (x, y) in claim.squares() {
-            fabric[x + FABRIC_W * y] += 1;
+        for square in claim.squares() {
+            fabric[square] += 1;
         }
     }
 
@@ -84,26 +127,24 @@ pub fn part1(input: &str) -> Result<usize> {
 }
 
 pub fn part2(input: &str) -> Result<i32> {
-    let claims = input
-        .trim()
-        .lines()
-        .map(|l| Claim::new(l))
-        .collect::<Result<Vec<_>>>()?;
+    let claims = parse_input(input)?;
 
-    let mut fabric = vec![0; FABRIC_W * FABRIC_H];
+    let mut fabric = Fabric::new(1000, 1000);
 
     for claim in claims.iter() {
-        for (x, y) in claim.squares() {
-            fabric[x + FABRIC_W * y] += 1;
+        for square in claim.squares() {
+            fabric[square] += 1;
         }
     }
 
     Ok(require_with!(
-        claims
-            .iter()
-            .find(|c| c.squares().all(|(x, y)| fabric[x + FABRIC_W * y] == 1)),
+        claims.iter().find(|c| c.squares().all(|s| fabric[s] == 1)),
         "all claims overlap!"
     ).id)
+}
+
+fn parse_input(input: &str) -> Result<Vec<Claim>> {
+    input.trim().lines().map(|l| parse(l)).collect()
 }
 
 #[cfg(test)]
