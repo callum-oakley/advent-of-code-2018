@@ -48,34 +48,7 @@ impl FromStr for Event {
 }
 
 pub fn part1(input: &str) -> Result<i32> {
-    let mut raw_logs = input.trim().lines().map(|l| l.trim()).collect::<Vec<_>>();
-    raw_logs.sort_unstable();
-    let logs = raw_logs
-        .iter()
-        .map(|l| parse::<Log>(l))
-        .collect::<Result<Vec<_>>>()?;
-
-    // Guard ID -> Minute -> times asleep at that minute
-    let mut guards = HashMap::new();
-    let mut on_duty = None;
-    let mut fell_asleep_at = None;
-
-    for log in logs {
-        match log.event {
-            Event::BeginsShift(id) => on_duty = Some(id),
-            Event::FallsAsleep => fell_asleep_at = Some(log.minute),
-            Event::WakesUp => {
-                for m in fell_asleep_at.take().unwrap()..log.minute {
-                    guards
-                        .entry(on_duty.unwrap())
-                        .or_insert(HashMap::new())
-                        .entry(m)
-                        .and_modify(|s| *s += 1)
-                        .or_insert(1);
-                }
-            }
-        }
-    }
+    let guards = parse_input(input)?;
 
     let id = *guards
         .keys()
@@ -88,6 +61,18 @@ pub fn part1(input: &str) -> Result<i32> {
 }
 
 pub fn part2(input: &str) -> Result<i32> {
+    let guards = parse_input(input)?;
+
+    let (id, minute) = guards
+        .keys()
+        .flat_map(|g| (0..49).map(move |m| (g, m)))
+        .max_by_key(|(g, m)| guards[g].get(m).unwrap_or(&0))
+        .unwrap();
+
+    Ok(id * minute as i32)
+}
+
+fn parse_input(input: &str) -> Result<HashMap<i32, HashMap<u8, i32>>> {
     let mut raw_logs = input.trim().lines().map(|l| l.trim()).collect::<Vec<_>>();
     raw_logs.sort_unstable();
     let logs = raw_logs
@@ -117,13 +102,7 @@ pub fn part2(input: &str) -> Result<i32> {
         }
     }
 
-    let (id, minute) = guards
-        .keys()
-        .flat_map(|g| (0..49).map(move |m| (g, m)))
-        .max_by_key(|(g, m)| guards[g].get(m).unwrap_or(&0))
-        .unwrap();
-
-    Ok(id * minute as i32)
+    Ok(guards)
 }
 
 #[cfg(test)]

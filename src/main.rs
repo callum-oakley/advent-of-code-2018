@@ -80,5 +80,6 @@ mod tests {
             Ok(Answer::new(6175, "asgwjcmzredihqoutcylvzinx"))
         );
         assert_eq!(run_day(3), Ok(Answer::new(106501, 632)));
+        assert_eq!(run_day(4), Ok(Answer::new(84834, 53427)));
     }
 }
