@@ -7,6 +7,7 @@ use std::{env, fmt, process};
 mod day01;
 mod day02;
 mod day03;
+mod day04;
 mod error;
 use error::Result;
 
@@ -29,11 +30,13 @@ fn run_day(day: u8) -> Result<Answer> {
     let input01 = include_str!("input/day01");
     let input02 = include_str!("input/day02");
     let input03 = include_str!("input/day03");
+    let input04 = include_str!("input/day04");
 
     match day {
         1 => Ok(Answer::new(day01::part1(input01)?, day01::part2(input01)?)),
         2 => Ok(Answer::new(day02::part1(input02)?, day02::part2(input02)?)),
         3 => Ok(Answer::new(day03::part1(input03)?, day03::part2(input03)?)),
+        4 => Ok(Answer::new(day04::part1(input04)?, day04::part2(input04)?)),
         day => bail!("day {} not yet implemented", day),
     }
 }
