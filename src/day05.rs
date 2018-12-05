@@ -1,39 +1,35 @@
 use error::Result;
 
 pub fn part1(input: &str) -> Result<usize> {
-    let mut chars = input.trim().as_bytes().iter().collect();
-    reduce(&mut chars);
-    Ok(chars.len())
+    Ok(reduce(input.trim().as_bytes().iter()).len())
 }
 
 pub fn part2(input: &str) -> Result<usize> {
     Ok((b'a'..=b'z')
         .map(|unit| {
-            let mut chars = input
-                .trim()
-                .as_bytes()
-                .iter()
-                .filter(|c| !unit.eq_ignore_ascii_case(c))
-                .collect();
-            reduce(&mut chars);
-            chars.len()
+            reduce(
+                input
+                    .trim()
+                    .as_bytes()
+                    .iter()
+                    .filter(|c| !unit.eq_ignore_ascii_case(c)),
+            ).len()
         }).min()
         .unwrap())
 }
 
-fn reduce(chars: &mut Vec<&u8>) {
-    let mut i = 0;
-    while i + 1 < chars.len() {
-        if reacts(chars[i], chars[i + 1]) {
-            chars.remove(i);
-            chars.remove(i);
-            if i > 0 {
-                i -= 1;
-            }
-        } else {
-            i += 1;
+fn reduce<'a>(chars: impl Iterator<Item = &'a u8>) -> Vec<&'a u8> {
+    let mut res = Vec::new();
+    for x in chars {
+        match res.pop() {
+            Some(y) => if !reacts(x, y) {
+                res.push(y);
+                res.push(x);
+            },
+            None => res.push(x),
         }
     }
+    res
 }
 
 fn reacts(x: &u8, y: &u8) -> bool {
