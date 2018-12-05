@@ -90,9 +90,9 @@ fn parse_input(input: &str) -> Result<HashMap<i32, HashMap<u8, i32>>> {
             Event::BeginsShift(id) => on_duty = Some(id),
             Event::FallsAsleep => fell_asleep_at = Some(log.minute),
             Event::WakesUp => {
-                for m in fell_asleep_at.take().unwrap()..log.minute {
+                for m in require_with!(fell_asleep_at.take(), "guard not asleep!")..log.minute {
                     guards
-                        .entry(on_duty.unwrap())
+                        .entry(require_with!(on_duty, "no guard on duty!"))
                         .or_insert(HashMap::new())
                         .entry(m)
                         .and_modify(|s| *s += 1)
