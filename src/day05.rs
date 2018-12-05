@@ -24,7 +24,7 @@ pub fn part2(input: &str) -> Result<usize> {
 fn reduce(chars: &mut Vec<&u8>) {
     let mut i = 0;
     while i + 1 < chars.len() {
-        if reacts(*chars[i], *chars[i + 1]) {
+        if reacts(chars[i], chars[i + 1]) {
             chars.remove(i);
             chars.remove(i);
             if i > 0 {
@@ -36,10 +36,8 @@ fn reduce(chars: &mut Vec<&u8>) {
     }
 }
 
-fn reacts(x: u8, y: u8) -> bool {
-    (x.is_ascii_lowercase() && y.is_ascii_uppercase()
-        || x.is_ascii_uppercase() && y.is_ascii_lowercase())
-        && x.eq_ignore_ascii_case(&y)
+fn reacts(x: &u8, y: &u8) -> bool {
+    *x != *y && x.eq_ignore_ascii_case(&y)
 }
 
 #[cfg(test)]
