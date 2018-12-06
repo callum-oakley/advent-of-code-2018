@@ -1,7 +1,9 @@
 use regex::Regex;
 use std::str::FromStr;
 
-pub use simple_error::{SimpleError as Error, SimpleResult as Result};
+pub use simple_error::{
+    bail, require_with, try_with, SimpleError as Error, SimpleResult as Result,
+};
 
 pub fn parse<F>(s: &str) -> Result<F>
 where

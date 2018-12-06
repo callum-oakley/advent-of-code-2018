@@ -2,6 +2,7 @@
 name = "advent-of-code-2018"
 version = "0.1.0"
 authors = ["Callum Oakley <c.oakley108@gmail.com>"]
+edition = "2018"
 
 [dependencies]
 simple-error = "0.1"

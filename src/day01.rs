@@ -1,4 +1,4 @@
-use error::{parse, re, Result};
+use crate::error::{parse, re, Result};
 use std::collections::HashSet;
 
 pub fn part1(input: &str) -> Result<i32> {

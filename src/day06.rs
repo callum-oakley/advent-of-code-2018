@@ -1,4 +1,4 @@
-use error::{parse, re, Result};
+use crate::error::{parse, re, require_with, Result};
 use std::cmp::Ordering;
 use std::collections::{HashMap, HashSet};
 
@@ -86,7 +86,8 @@ fn parse_input(input: &str) -> Result<HashSet<(i32, i32)>> {
                 l,
             );
             Ok((parse(&caps[1])?, parse(&caps[2])?))
-        }).collect()
+        })
+        .collect()
 }
 
 #[cfg(test)]

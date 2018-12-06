@@ -1,4 +1,4 @@
-use error::{re, Result};
+use crate::error::{bail, re, Result};
 use std::collections::HashMap;
 
 pub fn part1(input: &str) -> Result<usize> {

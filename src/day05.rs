@@ -1,4 +1,4 @@
-use error::Result;
+use crate::error::Result;
 
 pub fn part1(input: &str) -> Result<usize> {
     Ok(reduce(input.trim().as_bytes().iter()).len())
@@ -13,8 +13,10 @@ pub fn part2(input: &str) -> Result<usize> {
                     .as_bytes()
                     .iter()
                     .filter(|c| !unit.eq_ignore_ascii_case(c)),
-            ).len()
-        }).min()
+            )
+            .len()
+        })
+        .min()
         .unwrap())
 }
 
@@ -22,10 +24,12 @@ fn reduce<'a>(chars: impl Iterator<Item = &'a u8>) -> Vec<&'a u8> {
     let mut res = Vec::new();
     for x in chars {
         match res.pop() {
-            Some(y) => if !reacts(x, y) {
-                res.push(y);
-                res.push(x);
-            },
+            Some(y) => {
+                if !reacts(x, y) {
+                    res.push(y);
+                    res.push(x);
+                }
+            }
             None => res.push(x),
         }
     }

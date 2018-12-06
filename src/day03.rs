@@ -1,4 +1,4 @@
-use error::{parse, re, Error, Result};
+use crate::error::{parse, re, require_with, Error, Result};
 use std::collections::HashMap;
 use std::iter::Iterator;
 use std::str::FromStr;
@@ -67,7 +67,8 @@ pub fn part2(input: &str) -> Result<i32> {
     Ok(require_with!(
         claims.iter().find(|c| c.squares().all(|s| fabric[&s] == 1)),
         "all claims overlap!"
-    ).id)
+    )
+    .id)
 }
 
 fn parse_input(input: &str) -> Result<Vec<Claim>> {

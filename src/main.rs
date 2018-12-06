@@ -1,7 +1,3 @@
-#[macro_use]
-extern crate simple_error;
-extern crate regex;
-
 use std::{env, fmt, process};
 
 mod day01;
@@ -11,7 +7,8 @@ mod day04;
 mod day05;
 mod day06;
 mod error;
-use error::Result;
+
+use crate::error::{bail, try_with, Result};
 
 #[derive(Debug, PartialEq)]
 struct Answer {

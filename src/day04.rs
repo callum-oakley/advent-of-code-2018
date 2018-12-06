@@ -1,4 +1,4 @@
-use error::{parse, re, Error, Result};
+use crate::error::{bail, parse, re, require_with, Error, Result};
 use std::collections::HashMap;
 use std::str::FromStr;
 
