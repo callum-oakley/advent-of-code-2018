@@ -21,11 +21,11 @@ pub fn part2(input: &str) -> Result<usize> {
 }
 
 fn reduce<'a>(chars: impl Iterator<Item = &'a u8>) -> Vec<&'a u8> {
-    let mut res = Vec::new();
+    let mut res: Vec<&u8> = Vec::new();
     for x in chars {
         match res.pop() {
             Some(y) => {
-                if !reacts(x, y) {
+                if !reacts(*x, *y) {
                     res.push(y);
                     res.push(x);
                 }
@@ -36,8 +36,8 @@ fn reduce<'a>(chars: impl Iterator<Item = &'a u8>) -> Vec<&'a u8> {
     res
 }
 
-fn reacts(x: &u8, y: &u8) -> bool {
-    *x != *y && x.eq_ignore_ascii_case(&y)
+fn reacts(x: u8, y: u8) -> bool {
+    x != y && x.eq_ignore_ascii_case(&y)
 }
 
 #[cfg(test)]

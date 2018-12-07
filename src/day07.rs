@@ -9,20 +9,24 @@ pub fn part2(input: &str, workers: u8, base_seconds: u32) -> Result<u32> {
     work(input, workers, base_seconds).map(|(_, t)| t)
 }
 
-#[derive(Debug)]
 struct Job {
     step: char,
     time_remaining: u32,
 }
 
 fn work(input: &str, workers: u8, base_seconds: u32) -> Result<(String, u32)> {
-    let (mut ready, blocks, mut blocked_by) = parse_input(input)?;
+    let Project {
+        mut ready,
+        blocks,
+        mut blocked_by,
+    } = parse_input(input)?;
+
     let mut in_progress = HashMap::new();
     let mut idle: HashSet<_> = (0..workers).collect();
     let mut steps = String::new();
     let mut t = 0;
 
-    while ready.len() > 0 || idle.len() != workers as usize {
+    while !ready.is_empty() || idle.len() != workers as usize {
         for worker in idle.clone().iter() {
             in_progress.remove(worker);
             ready.sort_unstable_by(|a, b| b.cmp(a));
@@ -49,7 +53,7 @@ fn work(input: &str, workers: u8, base_seconds: u32) -> Result<(String, u32)> {
                     for b in blocked {
                         if let Some(blocking) = blocked_by.get_mut(&b) {
                             blocking.remove(&job.step);
-                            if blocking.len() == 0 {
+                            if blocking.is_empty() {
                                 ready.push(*b);
                             }
                         }
@@ -63,16 +67,16 @@ fn work(input: &str, workers: u8, base_seconds: u32) -> Result<(String, u32)> {
 }
 
 fn time_to_complete(base_seconds: u32, c: char) -> u32 {
-    base_seconds + *c.to_string().as_bytes().iter().next().unwrap() as u32 - 64
+    base_seconds + u32::from(*c.to_string().as_bytes().iter().next().unwrap()) - 64
 }
 
-fn parse_input(
-    input: &str,
-) -> Result<(
-    Vec<char>,
-    HashMap<char, HashSet<char>>,
-    HashMap<char, HashSet<char>>,
-)> {
+struct Project {
+    ready: Vec<char>,
+    blocks: HashMap<char, HashSet<char>>,
+    blocked_by: HashMap<char, HashSet<char>>,
+}
+
+fn parse_input(input: &str) -> Result<Project> {
     let mut blocks = HashMap::new();
     let mut blocked_by = HashMap::new();
 
@@ -88,12 +92,12 @@ fn parse_input(
 
         blocks
             .entry(blocking)
-            .or_insert(HashSet::new())
+            .or_insert_with(HashSet::new)
             .insert(blocked);
 
         blocked_by
             .entry(blocked)
-            .or_insert(HashSet::new())
+            .or_insert_with(HashSet::new)
             .insert(blocking);
     }
 
@@ -105,7 +109,11 @@ fn parse_input(
         .cloned()
         .collect();
 
-    Ok((ready, blocks, blocked_by))
+    Ok(Project {
+        ready,
+        blocks,
+        blocked_by,
+    })
 }
 
 #[cfg(test)]

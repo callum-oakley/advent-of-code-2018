@@ -17,7 +17,7 @@ pub fn part1(input: &str) -> Result<i32> {
 
     for x in min_x..=max_x {
         for y in min_y..=max_y {
-            if let Some(p) = unique_closest_point(&points, &(x, y)) {
+            if let Some(p) = unique_closest_point(&points, (x, y)) {
                 // The points with inifinite closest areas are the points that are closest to the
                 // boundary.
                 if x == min_x || x == max_x || y == min_y || y == max_y {
@@ -44,34 +44,35 @@ pub fn part2(input: &str, total_distance: i32) -> Result<usize> {
 
     Ok((min_x..=max_x)
         .flat_map(|x| (min_y..=max_y).map(move |y| (x, y)))
-        .filter(|q| points.iter().map(|p| distance(p, q)).sum::<i32>() < total_distance)
+        .filter(|q| points.iter().map(|p| distance(*p, *q)).sum::<i32>() < total_distance)
         .count())
 }
 
-fn distance(p: &(i32, i32), q: &(i32, i32)) -> i32 {
+fn distance(p: (i32, i32), q: (i32, i32)) -> i32 {
     (p.0 - q.0).abs() + (p.1 - q.1).abs()
 }
 
 fn unique_closest_point<'a>(
     points: &'a HashSet<(i32, i32)>,
-    q: &(i32, i32),
+    q: (i32, i32),
 ) -> Option<&'a (i32, i32)> {
     let (min, unique) = points.iter().fold((None, true), |(min, unique), p| {
         if let Some((_, min_dist)) = min {
-            let dist = distance(p, q);
+            let dist = distance(*p, q);
             match dist.cmp(&min_dist) {
                 Ordering::Less => (Some((p, dist)), true),
                 Ordering::Equal => (min, false),
                 Ordering::Greater => (min, unique),
             }
         } else {
-            (Some((p, distance(p, q))), unique)
+            (Some((p, distance(*p, q))), unique)
         }
     });
 
-    match unique {
-        true => min.map(|(p, _)| p),
-        false => None,
+    if unique {
+        min.map(|(p, _)| p)
+    } else {
+        None
     }
 }
 

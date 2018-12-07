@@ -57,7 +57,7 @@ pub fn part1(input: &str) -> Result<i32> {
 
     let minute = *guards[&id].keys().max_by_key(|m| guards[&id][m]).unwrap();
 
-    Ok(id * minute as i32)
+    Ok(id * i32::from(minute))
 }
 
 pub fn part2(input: &str) -> Result<i32> {
@@ -69,7 +69,7 @@ pub fn part2(input: &str) -> Result<i32> {
         .max_by_key(|(g, m)| guards[g].get(m).unwrap_or(&0))
         .unwrap();
 
-    Ok(id * minute as i32)
+    Ok(id * i32::from(minute))
 }
 
 fn parse_input(input: &str) -> Result<HashMap<i32, HashMap<u8, i32>>> {
@@ -93,7 +93,7 @@ fn parse_input(input: &str) -> Result<HashMap<i32, HashMap<u8, i32>>> {
                 for m in require_with!(fell_asleep_at.take(), "guard not asleep!")..log.minute {
                     guards
                         .entry(require_with!(on_duty, "no guard on duty!"))
-                        .or_insert(HashMap::new())
+                        .or_insert_with(HashMap::new)
                         .entry(m)
                         .and_modify(|s| *s += 1)
                         .or_insert(1);
