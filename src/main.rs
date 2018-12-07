@@ -6,6 +6,7 @@ mod day03;
 mod day04;
 mod day05;
 mod day06;
+mod day07;
 mod error;
 
 use crate::error::{bail, try_with, Result};
@@ -32,6 +33,7 @@ fn run_day(day: u8) -> Result<Answer> {
     let input04 = include_str!("input/day04");
     let input05 = include_str!("input/day05");
     let input06 = include_str!("input/day06");
+    let input07 = include_str!("input/day07");
 
     match day {
         1 => Ok(Answer::new(day01::part1(input01)?, day01::part2(input01)?)),
@@ -42,6 +44,10 @@ fn run_day(day: u8) -> Result<Answer> {
         6 => Ok(Answer::new(
             day06::part1(input06)?,
             day06::part2(input06, 10000)?,
+        )),
+        7 => Ok(Answer::new(
+            day07::part1(input07)?,
+            day07::part2(input07, 5, 60)?,
         )),
         day => bail!("day {} not yet implemented", day),
     }
@@ -89,5 +95,9 @@ mod tests {
         assert_eq!(run_day(4), Ok(Answer::new(84834, 53427)));
         assert_eq!(run_day(5), Ok(Answer::new(11310, 6020)));
         assert_eq!(run_day(6), Ok(Answer::new(3449, 44868)));
+        assert_eq!(
+            run_day(7),
+            Ok(Answer::new("ABGKCMVWYDEHFOPQUILSTNZRJX", 898))
+        );
     }
 }
