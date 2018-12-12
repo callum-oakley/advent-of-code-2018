@@ -1,10 +1,61 @@
+use crate::de_list::DeList;
 use crate::error::Result;
-use crate::ring::Ring;
 use std::collections::HashMap;
+use std::rc::Rc;
 
 type Score = i64;
 type Elf = i32;
 
+#[derive(Debug)]
+struct Ring(Rc<DeList<Score>>);
+
+impl Ring {
+    fn new() -> Self {
+        let root = Rc::new(DeList::new(0));
+        root.set_left(&root);
+        root.set_right(&root);
+        Ring(root)
+    }
+
+    fn insert(&mut self, value: Score) {
+        let new = Rc::new(DeList::new(value));
+        let left = self.0.left();
+
+        new.set_left(&left);
+        left.set_right(&new);
+
+        new.set_right(&self.0);
+        self.0.set_left(&new);
+
+        self.rotate_left(1);
+    }
+
+    fn remove(&mut self) -> Score {
+        let left = self.0.left();
+        let right = self.0.right();
+
+        let value = *self.0.value();
+
+        left.set_right(&right);
+        right.set_left(&left);
+
+        *self = Ring(right);
+
+        value
+    }
+
+    fn rotate_left(&mut self, n: usize) {
+        for _ in 0..n {
+            *self = Ring(self.0.left());
+        }
+    }
+
+    fn rotate_right(&mut self, n: usize) {
+        for _ in 0..n {
+            *self = Ring(self.0.right());
+        }
+    }
+}
 #[derive(Debug)]
 struct Game {
     marbles: Ring,
@@ -29,12 +80,12 @@ impl Game {
         }
     }
 
-    fn high_score(&self) -> i64 {
+    fn high_score(&self) -> Score {
         self.scores.values().cloned().max().unwrap_or(0)
     }
 }
 
-pub fn part1(players: i32, last_marble: i64) -> Result<i64> {
+pub fn part1(players: Elf, last_marble: Score) -> Result<Score> {
     let mut game = Game::new();
     for (marble, elf) in (1..=last_marble).zip((0..players).cycle()) {
         game.play_turn(marble, elf);
@@ -42,7 +93,7 @@ pub fn part1(players: i32, last_marble: i64) -> Result<i64> {
     Ok(game.high_score())
 }
 
-pub fn part2(players: i32, last_marble: i64) -> Result<i64> {
+pub fn part2(players: Elf, last_marble: Score) -> Result<Score> {
     let mut game = Game::new();
     for (marble, elf) in (1..=last_marble * 100).zip((0..players).cycle()) {
         game.play_turn(marble, elf);

@@ -9,8 +9,10 @@ mod day06;
 mod day07;
 mod day08;
 mod day09;
+mod day10;
+mod de_list;
 mod error;
-mod ring;
+mod point;
 
 use crate::error::{bail, try_with, Result};
 
@@ -38,6 +40,7 @@ fn run_day(day: u8) -> Result<Answer> {
     let input06 = include_str!("input/day06");
     let input07 = include_str!("input/day07");
     let input08 = include_str!("input/day08");
+    let input10 = include_str!("input/day10");
 
     match day {
         1 => Ok(Answer::new(day01::part1(input01)?, day01::part2(input01)?)),
@@ -58,6 +61,7 @@ fn run_day(day: u8) -> Result<Answer> {
             day09::part1(466, 71436)?,
             day09::part2(466, 71436)?,
         )),
+        10 => Ok(Answer::new(day10::part1(input10, 10009)?, 10009)),
         day => bail!("day {} not yet implemented", day),
     }
 }
@@ -93,6 +97,19 @@ fn main() {
 mod tests {
     use super::*;
 
+    const FBHKLEAG: &'static str = "
+        ######..#####...#....#..#....#..#.......######....##.....####.
+        #.......#....#..#....#..#...#...#.......#........#..#...#....#
+        #.......#....#..#....#..#..#....#.......#.......#....#..#.....
+        #.......#....#..#....#..#.#.....#.......#.......#....#..#.....
+        #####...#####...######..##......#.......#####...#....#..#.....
+        #.......#....#..#....#..##......#.......#.......######..#..###
+        #.......#....#..#....#..#.#.....#.......#.......#....#..#....#
+        #.......#....#..#....#..#..#....#.......#.......#....#..#....#
+        #.......#....#..#....#..#...#...#.......#.......#....#..#...##
+        #.......#####...#....#..#....#..######..######..#....#...###.#
+    ";
+
     #[test]
     fn all_days() {
         assert_eq!(run_day(1), Ok(Answer::new(470, 790)));
@@ -110,5 +127,16 @@ mod tests {
         );
         assert_eq!(run_day(8), Ok(Answer::new(42254, 25007)));
         assert_eq!(run_day(9), Ok(Answer::new(382055, 3133277384i64)));
+        assert_eq!(
+            run_day(10),
+            Ok(Answer::new(
+                FBHKLEAG
+                    .trim_end()
+                    .lines()
+                    .map(|l| format!("{}\n", l.trim_start()))
+                    .collect::<String>(),
+                10009
+            ))
+        );
     }
 }
