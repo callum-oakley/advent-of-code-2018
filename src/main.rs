@@ -10,6 +10,7 @@ mod day07;
 mod day08;
 mod day09;
 mod day10;
+mod day11;
 mod de_list;
 mod error;
 mod point;
@@ -62,6 +63,7 @@ fn run_day(day: u8) -> Result<Answer> {
             day09::part2(466, 71436)?,
         )),
         10 => Ok(Answer::new(day10::part1(input10, 10009)?, 10009)),
+        11 => Ok(Answer::new(day11::part1(3613)?, day11::part2(3613)?)),
         day => bail!("day {} not yet implemented", day),
     }
 }
@@ -138,5 +140,6 @@ mod tests {
                 10009
             ))
         );
+        assert_eq!(run_day(11), Ok(Answer::new("20,54", "233,93,13")));
     }
 }
