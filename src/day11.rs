@@ -1,12 +1,12 @@
 use crate::error::Result;
-use std::collections::HashMap;
+use std::cmp::max;
 
 pub fn part1(serial: i32) -> Result<String> {
-    let (x, y) = (1..=300)
-        .flat_map(|x| (1..=300).map(move |y| (x, y)))
+    let (x, y) = (1..=300usize)
+        .flat_map(|x| (1..=300usize).map(move |y| (x, y)))
         .max_by_key(|(x, y)| {
             (0..3)
-                .flat_map(|i| (0..3).map(move |j| power(x + i, y + j, serial)))
+                .flat_map(|i| (0..3usize).map(move |j| power(x + i, y + j, serial)))
                 .sum::<i32>()
         })
         .unwrap();
@@ -14,24 +14,29 @@ pub fn part1(serial: i32) -> Result<String> {
 }
 
 pub fn part2(serial: i32) -> Result<String> {
-    let mut squares = HashMap::new();
+    // https://en.wikipedia.org/wiki/Summed-area_table
+    let mut sat = vec![0; 301 * 301];
     for (x, y) in (1..=300).flat_map(|x| (1..=300).map(move |y| (x, y))) {
-        let mut size = 1;
-        let mut p = 0;
-        while x + size - 1 <= 300 && y + size - 1 <= 300 {
-            p += power(x + size - 1, y + size - 1, serial);
-            for i in 0..size - 1 {
-                p += power(x + i, y + size - 1, serial) + power(x + size - 1, y + i, serial);
-            }
-            squares.insert((x, y, size), p);
-            size += 1;
-        }
+        sat[x + y * 301] = power(x, y, serial) + sat[x + (y - 1) * 301] + sat[x - 1 + y * 301]
+            - sat[x - 1 + (y - 1) * 301];
     }
-    let (x, y, size) = squares.keys().max_by_key(|k| squares[k]).unwrap();
+
+    let (x, y, size) = (1..=300usize)
+        .flat_map(|x| (1..=300usize).map(move |y| (x, y)))
+        .flat_map(|(x, y)| (1..=301usize - max(x, y)).map(move |size| (x, y, size)))
+        .max_by_key(|(x, y, size)| {
+            sat[x + size - 1 + (y + size - 1) * 301] + sat[x - 1 + (y - 1) * 301]
+                - sat[x - 1 + (y + size - 1) * 301]
+                - sat[x + size - 1 + (y - 1) * 301]
+        })
+        .unwrap();
+
     Ok(format!("{},{},{}", x, y, size))
 }
 
-fn power(x: i32, y: i32, serial: i32) -> i32 {
+fn power(x: usize, y: usize, serial: i32) -> i32 {
+    let x = x as i32;
+    let y = y as i32;
     ((x + 10) * y + serial) * (x + 10) / 100 % 10 - 5
 }
 
