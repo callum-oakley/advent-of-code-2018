@@ -15,19 +15,18 @@ pub fn part1(serial: i32) -> Result<String> {
 
 pub fn part2(serial: i32) -> Result<String> {
     // https://en.wikipedia.org/wiki/Summed-area_table
-    let mut sat = vec![0; 301 * 301];
+    let mut sat = vec![vec![0; 301]; 301];
     for (x, y) in (1..=300).flat_map(|x| (1..=300).map(move |y| (x, y))) {
-        sat[x + y * 301] = power(x, y, serial) + sat[x + (y - 1) * 301] + sat[x - 1 + y * 301]
-            - sat[x - 1 + (y - 1) * 301];
+        sat[x][y] = power(x, y, serial) + sat[x][y - 1] + sat[x - 1][y] - sat[x - 1][y - 1];
     }
 
     let (x, y, size) = (1..=300usize)
         .flat_map(|x| (1..=300usize).map(move |y| (x, y)))
         .flat_map(|(x, y)| (1..=301usize - max(x, y)).map(move |size| (x, y, size)))
         .max_by_key(|(x, y, size)| {
-            sat[x + size - 1 + (y + size - 1) * 301] + sat[x - 1 + (y - 1) * 301]
-                - sat[x - 1 + (y + size - 1) * 301]
-                - sat[x + size - 1 + (y - 1) * 301]
+            sat[x + size - 1][y + size - 1] + sat[x - 1][y - 1]
+                - sat[x - 1][y + size - 1]
+                - sat[x + size - 1][y - 1]
         })
         .unwrap();
 
