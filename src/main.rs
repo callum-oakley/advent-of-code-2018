@@ -11,6 +11,7 @@ mod day08;
 mod day09;
 mod day10;
 mod day11;
+mod day12;
 mod de_list;
 mod error;
 mod point;
@@ -42,6 +43,7 @@ fn run_day(day: u8) -> Result<Answer> {
     let input07 = include_str!("input/day07");
     let input08 = include_str!("input/day08");
     let input10 = include_str!("input/day10");
+    let input12 = include_str!("input/day12");
 
     match day {
         1 => Ok(Answer::new(day01::part1(input01)?, day01::part2(input01)?)),
@@ -64,6 +66,7 @@ fn run_day(day: u8) -> Result<Answer> {
         )),
         10 => Ok(Answer::new(day10::part1(input10, 10009)?, 10009)),
         11 => Ok(Answer::new(day11::part1(3613)?, day11::part2(3613)?)),
+        12 => Ok(Answer::new(day12::part1(input12)?, 3350000000000i64)),
         day => bail!("day {} not yet implemented", day),
     }
 }
@@ -141,5 +144,6 @@ mod tests {
             ))
         );
         assert_eq!(run_day(11), Ok(Answer::new("20,54", "233,93,13")));
+        assert_eq!(run_day(12), Ok(Answer::new("3405", 3350000000000i64)));
     }
 }
