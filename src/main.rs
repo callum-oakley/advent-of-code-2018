@@ -148,5 +148,6 @@ mod tests {
         );
         assert_eq!(run_day(11), Ok(Answer::new("20,54", "233,93,13")));
         assert_eq!(run_day(12), Ok(Answer::new("3405", 3350000000000i64)));
+        assert_eq!(run_day(13), Ok(Answer::new("41,22", "84,90")));
     }
 }

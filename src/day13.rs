@@ -1,6 +1,6 @@
 use crate::error::Result;
 use std::cell::RefCell;
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 
 #[derive(Debug, Clone)]
 struct Cart {
@@ -66,24 +66,14 @@ pub fn part1(input: &str) -> Result<String> {
     let (mut carts, tracks) = parse_input(input);
 
     loop {
-        carts.sort_unstable_by(|a, b| {
-            let a = a.borrow();
-            let b = b.borrow();
-            if a.pos.1 == b.pos.1 {
-                a.pos.0.cmp(&b.pos.0)
-            } else {
-                a.pos.1.cmp(&b.pos.1)
-            }
-        });
+        sort_carts(&mut carts);
         for cart in carts.iter() {
             let pos = cart.borrow().pos;
             if let Some(c) = tracks.get(&pos) {
-                if *c == '/' || *c == '\\' || *c == '+' {
-                    cart.borrow_mut().turn(*c);
-                }
+                cart.borrow_mut().turn(*c);
             }
             cart.borrow_mut().tick();
-            if let Some((x, y)) = find_crash(&carts) {
+            if let Some((x, y)) = mark_crashed(&carts) {
                 return Ok(format!("{},{}", x, y));
             }
         }
@@ -94,21 +84,11 @@ pub fn part2(input: &str) -> Result<String> {
     let (mut carts, tracks) = parse_input(input);
 
     loop {
-        carts.sort_unstable_by(|a, b| {
-            let a = a.borrow();
-            let b = b.borrow();
-            if a.pos.1 == b.pos.1 {
-                a.pos.0.cmp(&b.pos.0)
-            } else {
-                a.pos.1.cmp(&b.pos.1)
-            }
-        });
+        sort_carts(&mut carts);
         for cart in carts.iter() {
             let pos = cart.borrow().pos;
             if let Some(c) = tracks.get(&pos) {
-                if *c == '/' || *c == '\\' || *c == '+' {
-                    cart.borrow_mut().turn(*c);
-                }
+                cart.borrow_mut().turn(*c);
             }
             cart.borrow_mut().tick();
             mark_crashed(&carts);
@@ -121,21 +101,7 @@ pub fn part2(input: &str) -> Result<String> {
     }
 }
 
-fn find_crash(carts: &Vec<RefCell<Cart>>) -> Option<(usize, usize)> {
-    let mut seen = HashSet::new();
-
-    for cart in carts {
-        let cart = cart.borrow();
-        if seen.contains(&cart.pos) {
-            return Some(cart.pos);
-        }
-        seen.insert(cart.pos);
-    }
-
-    None
-}
-
-fn mark_crashed(carts: &Vec<RefCell<Cart>>) {
+fn mark_crashed(carts: &Vec<RefCell<Cart>>) -> Option<(usize, usize)> {
     for i in 0..carts.len() {
         for j in 0..i {
             let mut cart_i = carts[i].borrow_mut();
@@ -143,9 +109,23 @@ fn mark_crashed(carts: &Vec<RefCell<Cart>>) {
             if !cart_i.crashed && !cart_j.crashed && cart_i.pos == cart_j.pos {
                 cart_i.crashed = true;
                 cart_j.crashed = true;
+                return Some(cart_i.pos);
             }
         }
     }
+    None
+}
+
+fn sort_carts(carts: &mut Vec<RefCell<Cart>>) {
+    carts.sort_unstable_by(|a, b| {
+        let a = a.borrow();
+        let b = b.borrow();
+        if a.pos.1 == b.pos.1 {
+            a.pos.0.cmp(&b.pos.0)
+        } else {
+            a.pos.1.cmp(&b.pos.1)
+        }
+    });
 }
 
 fn parse_input(input: &str) -> (Vec<RefCell<Cart>>, HashMap<(usize, usize), char>) {
