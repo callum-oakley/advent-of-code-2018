@@ -13,6 +13,7 @@ mod day10;
 mod day11;
 mod day12;
 mod day13;
+mod day14;
 mod de_list;
 mod error;
 mod point;
@@ -68,8 +69,9 @@ fn run_day(day: u8) -> Result<Answer> {
         )),
         10 => Ok(Answer::new(day10::part1(input10, 10009)?, 10009)),
         11 => Ok(Answer::new(day11::part1(3613)?, day11::part2(3613)?)),
-        12 => Ok(Answer::new(day12::part1(input12)?, 3350000000000i64)),
+        12 => Ok(Answer::new(day12::part1(input12)?, 3_350_000_000_000i64)),
         13 => Ok(Answer::new(day13::part1(input13)?, day13::part2(input13)?)),
+        14 => Ok(Answer::new(day14::part1(409_551)?, day14::part2("409551")?)),
         day => bail!("day {} not yet implemented", day),
     }
 }
@@ -134,7 +136,7 @@ mod tests {
             Ok(Answer::new("ABGKCMVWYDEHFOPQUILSTNZRJX", 898))
         );
         assert_eq!(run_day(8), Ok(Answer::new(42254, 25007)));
-        assert_eq!(run_day(9), Ok(Answer::new(382055, 3133277384i64)));
+        assert_eq!(run_day(9), Ok(Answer::new(382055, 3_133_277_384i64)));
         assert_eq!(
             run_day(10),
             Ok(Answer::new(
@@ -147,7 +149,8 @@ mod tests {
             ))
         );
         assert_eq!(run_day(11), Ok(Answer::new("20,54", "233,93,13")));
-        assert_eq!(run_day(12), Ok(Answer::new("3405", 3350000000000i64)));
+        assert_eq!(run_day(12), Ok(Answer::new("3405", 3_350_000_000_000i64)));
         assert_eq!(run_day(13), Ok(Answer::new("41,22", "84,90")));
+        assert_eq!(run_day(14), Ok(Answer::new("1631191756", 20219475)));
     }
 }

@@ -101,7 +101,7 @@ pub fn part2(input: &str) -> Result<String> {
     }
 }
 
-fn mark_crashed(carts: &Vec<RefCell<Cart>>) -> Option<(usize, usize)> {
+fn mark_crashed(carts: &[RefCell<Cart>]) -> Option<(usize, usize)> {
     for i in 0..carts.len() {
         for j in 0..i {
             let mut cart_i = carts[i].borrow_mut();
